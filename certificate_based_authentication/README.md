@@ -4,10 +4,10 @@
   - [Create a token on CVP](#create-a-token-on-cvp)
   - [Copy the token to the switch](#copy-the-token-to-the-switch)
   - [Configure TerminAttr](#configure-terminattr)
-  - [Verify Certificate on Switch](#verify-certificate-on-switch)
-  - [Verify Certificate on CVP](#verify-certificate-on-cvp)
+  - [Verify the certificate on the switch](#verify-the-certificate-on-the-switch)
+  - [Verify that certificate based authentication is used on CVP](#verify-that-certificate-based-authentication-is-used-on-cvp)
   - [Verify that the device data is still streaming to CVP](#verify-that-the-device-data-is-still-streaming-to-cvp)
-  - [Check the device configuration compliancy](#check-the-device-configuration-compliancy)
+  - [Check the device configuration compliance](#check-the-device-configuration-compliance)
 
 # Certificate-based authentication
 
@@ -65,11 +65,14 @@ When the daemon TerminAttr restarts:
 
 - It generates a CSR (Certificate Signing Request)
   - The CN (Common Name) is the device SN.  
-- It then uses a CVP API with an HTTP POST to get the certificat.
+- It then uses a CVP API with an HTTP POST to get the certificate.
   - The HTTP body has the token and the CSR.
-- CVP has a CA. CVP verifies the token and generates the certificate.
+- CVP has an internal root CA. CVP verifies the token, generates the client certificate and sends it back to the switch
+  along with the root CA.
+- TerminAttr then discards the token (appends `.backup` to the filename) and will start using the client certificate from
+  that point onwards
 
-## Verify Certificate on Switch
+## Verify the certificate on the switch
 
 In the switch you will now notice that the temporary token has been renamed `token.backup` and that a certificate has been generated.
 
@@ -78,7 +81,7 @@ bash ls /tmp
 bash sudo ls /persist/secure/ssl/terminattr/primary
 ```
 
-## Verify Certificate on CVP
+## Verify that certificate based authentication is used on CVP
 
 On the CVP GUI, go to **Devices > Device Registration**.
 
@@ -92,7 +95,7 @@ You can now see how the devices are authenticated (via ingest key or certificate
 
 On the CVP GUI, go to **Devices > Inventory** and verify the streaming status.
 
-## Check the device configuration compliancy
+## Check the device configuration compliance
 
 The device configuration is now **out_of_compliance** as there is a difference between the **running configuration** and the **designated configuration**.  
 

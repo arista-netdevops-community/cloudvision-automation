@@ -47,6 +47,8 @@ This step is required before to generate a token.
 
 ![Copy Token](../images/token-service-account-add-token3.png)
 
+> NOTE that once `OK` is hit the token cannot be revealed anymore.
+
 ### Paste the Token
 
 - Create a new file named `token.tok` on your automation setup
